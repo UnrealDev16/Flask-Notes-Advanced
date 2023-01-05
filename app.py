@@ -29,8 +29,8 @@ def register():
 		session['email'] = email
 	else:
 		return render_template("index.html",error="Email or Password is empty",session="")
-	con.commit()
-	return render_template("index.html",session=session['email'])
+	con.commit();c.execute("SELECT note FROM Notes WHERE email = session['email']")
+	return render_template("index.html",session=session['email'],notes=c.fetchall())
 
 @app.route("/login",methods=['POST','GET'])
 def login():
