@@ -2,7 +2,7 @@ from flask import Flask , render_template , request , session
 import sqlite3
 
 app = Flask("__name__")
-app.secret_key = "LOL"
+app.secret_key = "secret"
 con = sqlite3.connect("users.db",check_same_thread=False)
 c = con.cursor()
 
@@ -25,11 +25,18 @@ def register():
 	email = request.form.get("email")
 	password = request.form.get("password")
 	if email and password:
-		c.execute("INSERT INTO Users VALUES(?,?)",(email,password))
-		session['email'] = email
+		c.execute("SELECT email FROM Users")
+		for db_email in c.fetchall():
+			if email == db_email[0]:
+				return render_template("index.html",error="Email already registered",session="")
+			else:
+				c.execute("INSERT INTO Users VALUES(?,?)",(email,password))
+				session['email'] = email
 	else:
 		return render_template("index.html",error="Email or Password is empty",session="")
-	con.commit();c.execute("SELECT note FROM Notes WHERE email = session['email']")
+		
+	con.commit()
+	c.execute("SELECT note FROM Notes WHERE email = (?)",(session['email'],))
 	return render_template("index.html",session=session['email'],notes=c.fetchall())
 
 @app.route("/login",methods=['POST','GET'])
