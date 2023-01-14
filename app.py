@@ -29,9 +29,8 @@ def register():
 		for db_email in c.fetchall():
 			if email == db_email[0]:
 				return render_template("index.html",error="Email already registered",session="")
-			else:
-				c.execute("INSERT INTO Users VALUES(?,?)",(email,password))
-				session['email'] = email
+		c.execute("INSERT INTO Users VALUES(?,?)",(email,password))
+		session['email'] = email
 	else:
 		return render_template("index.html",error="Email or Password is empty",session="")
 		
